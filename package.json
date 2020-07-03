@@ -1,0 +1,12 @@
+{
+  "license": "MIT",
+  "name": "light-control",
+  "description": "a small node server that links my office light to my f.lux installation",
+  "repository": "git@github.com:dashifen/light-control.git",
+  "version": "1.0.0",
+  "dependencies": {
+    "dotenv": "^8.2.0",
+    "tplink-cloud-api": "^0.6.1",
+    "uuidv4": "^6.1.1"
+  }
+}
