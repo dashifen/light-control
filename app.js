@@ -1,11 +1,10 @@
 require('dotenv').config();
 const url = require('url');
 const http = require('http');
-const { login } = require('tplink-cloud-api');
+const {login} = require('tplink-cloud-api');
 
 const LightControl = {
-    getPercent(request) {
-        const query = url.parse(request.url, true).query;
+    getPercent(query) {
 
         // if we have a color temp (CT) value in our request, then we use that
         // to calculate our percent.  otherwise, we just create a random value
@@ -40,14 +39,27 @@ const server = http.createServer(async (request, response) => {
     // request the office light.  then, if it's on, we'll do some stuff.
 
     const light = await tpLink.getLB100('Office Light');
-    if (await light.isOn()) {
+    const route = url.parse(request.url, true);
 
-        // now that we know it's on, we'll want to calculate the our percent
-        // using the above LightControl object.  then, we set our state using
-        // it as our luminosity.
+    switch (route.pathname) {
+        case "/turn-on":
+            await light.powerOn();
+            break;
 
-        const percent = LightControl.getPercent(request);
-        await light.setState(1, percent);
+        case "/turn-off":
+            await light.powerOff();
+            break;
+
+        default:
+            if (await light.isOn()) {
+
+                // now that we know it's on, we'll want to calculate the our percent
+                // using the above LightControl object.  then, we set our state using
+                // it as our luminosity.
+
+                const percent = LightControl.getPercent(route.query);
+                await light.setState(1, percent);
+            }
     }
 
     response.statusCode = 200;
